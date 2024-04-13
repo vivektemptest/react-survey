@@ -188,9 +188,7 @@ export default function DefualtLayout() {
               </Disclosure.Panel>
             </>
           )}
-        </Disclosure>
-
-        
+        </Disclosure>        
             <Outlet/>
       </div>
     </>
