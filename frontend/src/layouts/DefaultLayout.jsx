@@ -5,7 +5,8 @@ import { NavLink, Navigate, Outlet } from "react-router-dom";
 
 import { FaBars, FaBell, FaUser } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
-import { useStateContext } from './../contexts/ContextProvider'
+import { useStateContext } from "./../contexts/ContextProvider";
+import axiosClient from "../axios";
 
 // const user = {
 //   name: "Tom Cook",
@@ -27,13 +28,30 @@ function classNames(...classes) {
 }
 
 export default function DefualtLayout() {
-  const {currentUser,userToken} = useStateContext();
-  if(!userToken){
-    return <Navigate to='/login'/>
+  const { currentUser, userToken,setCurrentUser,setUserToken } = useStateContext();
+  if (!userToken) {
+    return <Navigate to="/login" />;
   }
-  const handleLogout = (e)=>{
-    console.log('logout');
-  }
+  const handleLogout = (e) => {
+    e.preventDefault();
+    axiosClient
+      .post("logout")
+      .then(({ data }) => {
+        console.log(data);
+        setCurrentUser({});
+        setUserToken(null);
+      })
+      .catch((error) => {
+        if (error.response && error.response.status == 422) {
+          const finalErrors = Object.values(error.response.data.errors).reduce(
+            (accum, next) => [...accum, ...next],
+            []
+          );
+          setError({ __html: finalErrors });
+        }
+        console.error(error);
+      });
+  };
   return (
     <>
       {/*
@@ -60,7 +78,7 @@ export default function DefualtLayout() {
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item,index) => (
+                        {navigation.map((item, index) => (
                           <NavLink
                             key={index}
                             to={item.to}
@@ -104,7 +122,7 @@ export default function DefualtLayout() {
                               src={user.imageUrl}
                               alt=""
                             /> */}
-                            <FaUser className="w-8 h-8 bg-black/25 rounded-full text-white"/>
+                            <FaUser className="w-8 h-8 bg-black/25 rounded-full text-white" />
                           </Menu.Button>
                         </div>
                         <Transition
@@ -123,7 +141,7 @@ export default function DefualtLayout() {
                               <a
                                 href="#"
                                 className="bg-gray-100 block px-4 py-2 text-sm text-gray-700"
-                                onClick={(e)=>handleLogout(e)}
+                                onClick={(e) => handleLogout(e)}
                               >
                                 Sign Out
                               </a>
@@ -179,7 +197,7 @@ export default function DefualtLayout() {
                         src={user.imageUrl}
                         alt=""
                       /> */}
-                      <FaUser className="w-8 h-8 bg-black/25 rounded-full text-white"/>
+                      <FaUser className="w-8 h-8 bg-black/25 rounded-full text-white" />
                     </div>
                     <div className="ml-3">
                       <div className="text-base font-medium leading-none text-white">
@@ -204,7 +222,7 @@ export default function DefualtLayout() {
                       as="a"
                       href="#"
                       className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                      onClick={(e)=>handleLogout(e)}
+                      onClick={(e) => handleLogout(e)}
                     >
                       Sign Out
                     </Disclosure.Button>

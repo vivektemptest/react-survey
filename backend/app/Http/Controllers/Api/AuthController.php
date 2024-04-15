@@ -9,6 +9,7 @@ use App\Http\Requests\Api\LoginRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\Api\SignupRequest;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -57,6 +58,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'user' => new UserResource($user),
+                'token'=>$token
             ])->withCookie($cookie);
         } catch (\Exception $ex) {
             throw $ex;
@@ -65,6 +67,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+
         $request->user()->currentAccessToken()->delete();
 
         $cookie = cookie()->forget('token');
